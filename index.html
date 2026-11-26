@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina Smart Visa </title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- SwiperJS CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+       body {
+    
+            background-image: url(Chicago\ 2.png);
+             background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+             margin: 0;
+            overflow-x: hidden;
+               
+        }
+
+        .banner-header {
+            background-color: #1A4DA1;
+            border-bottom: 4px solid #e20707;
+            box-shadow: 0 4px 20px rgba(233, 229, 229, 0.973);
+            position: relative;
+            z-index: 50;
+        }
+
+        .nav-btn {
+            position: relative;
+            overflow: hidden;
+            background: rgba(31, 159, 209, 0.76);
+            border: 2px solid rgba(15, 46, 187, 0.685);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+        }
+
+        .nav-btn:hover, .nav-btn.active-tab {
+            background: #280cc9;
+            border-color: #f71130;
+            color: #ffffffc9;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.5);
+        }
+
+        .glass-card {
+            background: rgba(121, 120, 120, 0.801);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(145, 37, 37, 0.836);
+            box-shadow: 0 8px 20px rgba(95, 95, 91, 0.89);
+        }
+
+        .glass-card-active {
+            background: rgba(184, 29, 29, 0.25);
+            border-color: #e63946;
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+        }
+
+        /* TRANSICIÓN DE PERSIANAS 3D */
+        #perspective-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99999;
+            pointer-events: none;
+            display: flex;
+            perspective: 1000px;
+        }
+
+        .slice-bar {
+            flex: 1;
+            height: 100%;
+            background: linear-gradient(180deg, #3665af 0%, #0e2c6d 100%);
+            border-right: 1px solid rgba(243, 223, 38, 0.815);
+            box-shadow: 0 0 15px rgba(224, 221, 221, 0.5);
+            transform-origin: top center;
+            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.5s ease;
+        }
+
+        body.page-loaded .slice-bar {
+            transform: rotateX(90deg) scaleY(0);
+            opacity: 0;
+            transition-delay: calc(var(--delay) * 0.05s);
+        }
+
+        body.page-exiting .slice-bar {
+            transform: rotateX(0deg) scaleY(1);
+            opacity: 1;
+            transition-delay: calc(var(--delay) * 0.04s);
+        }
+
+        #canvas-container {
+            width: 90%;
+            height: calc(100vh - 100px);
+            position: relative;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .modal-animate-enter {
+            animation: modalPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .card-dynamic {
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .card-dynamic:hover {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-4deg);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-spin {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .card-dynamic:hover .icon-spin {
+            transform: rotateY(180deg) scale(1.15);
+        }
+
+        /* ESTILOS DE TARJETAS PASOS */
+        .pasos-section { background-color: #0b2942; color: white; padding: 80px 20px; text-align: center; overflow: hidden; }
+        .pasos-section h2 { font-size: 34px; font-weight: 800; margin-bottom: 10px; color: #dd454c; }
+        .pasos-section p.subtitulo { color: #f4f5f7; font-size: 15px; margin-bottom: 50px; }
+        .pasos-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; max-width: 1100px; margin: 0 auto; perspective: 1000px; }
+        .flip-card { background-color: transparent; width: 240px; height: 280px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 16px; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
+        .flip-card-front { background: linear-gradient(145deg, #162447, #0f1a35); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .flip-card-front .numero-badge { background: #ca1322; color: #ffffff; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(230, 57, 70, 0.5); }
+        .flip-card-front h3 { font-size: 20px; color: #ffffff; margin-bottom: 12px; }
+        .flip-card-front .indicador { font-size: 12px; color: #ffffff; margin-top: auto; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .flip-card-back { background: linear-gradient(145deg, #072049, #0b1a3a); color: #ffffff; transform: rotateY(180deg); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .flip-card-back .icono-atras { font-size: 38px; margin-bottom: 15px; color: #ffffff; }
+        .flip-card-back h4 { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: #ffffff; }
+        .flip-card-back p { font-size: 13.5px; line-height: 1.5; color: #f0e8e2; font-weight: 500; }
+
+        .flag-img {
+            width: 36px;
+            height: 26px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        .floating-review-card {
+            background: linear-gradient(135deg, rgba(26, 77, 161, 0.4) 0%, rgba(11, 26, 58, 0.8) 100%);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(230, 57, 70, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .floating-review-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: #e21866;
+            box-shadow: 0 20px 40px rgba(238, 236, 236, 0.692);
+        }
+
+        .social-icon-flip { display: inline-block; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .social-icon-btn.loading .social-icon-flip { animation: flipIcon 0.8s ease-in-out infinite; color: #2fe717 !important; }
+
+        @keyframes flipIcon {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* CARRUSEL SWIPER EN SERVICIOS */
+        .swiper { width: 100%; padding-top: 20px; padding-bottom: 40px; }
+        .swiper-slide {
+            width: 310px; background: rgb(238, 234, 234);
+            backdrop-filter: blur(12px); border: 1px solid rgba(236, 184, 13, 0.87);
+            border-radius: 16px; text-align: center; color: rgb(243, 238, 238); transition-timing-function: linear !important;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            background-color: #e04545; color: rgb(250, 248, 248) !important;
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid rgb(241, 235, 235);
+            box-shadow: 0 4px 12px rgb(15, 111, 117);
+        }
+        .swiper-button-next::after, .swiper-button-prev::after { font-size: 18px !important; font-weight: bold; }
+
+        .hover-flip-icon { display: inline-block; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .group:hover .hover-flip-icon { transform: rotateY(360deg); color: #e63946 !important; }
+
+        .glow-card {
+            background: linear-gradient(135deg, rgba(235, 231, 231, 0.822) 0%, rgba(26, 77, 161, 0.3) 100%);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 50px rgba(211, 16, 32, 0.5), 0 0 30px rgba(230, 57, 70, 0.25);
+        }
+
+        .star-glow { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease; }
+        .star-glow:hover, .star-glow.active-star { transform: scale(1.3) rotate(-5deg); filter: drop-shadow(0 0 8px rgba(230, 57, 70, 0.8)); }
+
+        .input-focus-effect { transition: all 0.3s ease; }
+        .input-focus-effect:focus-within { border-color: #8b8b8b; box-shadow: 0 0 20px rgba(221, 12, 29, 0.4); transform: translateY(-2deg); }
+    
+    
+    </style>
+    </head>
+    <body class="min-h-screen flex flex-col">
+
+        <div id="perspective-transition-overlay"></div>
+
+        <!-- BANNER SUPERIOR UNIFICADO -->
+    <header class="banner-header w-full px-8 py-3 flex flex-row justify-between items-center sticky top-0 h-24">
+        <div class="flex items-center h-full">
+            <a onclick="switchPage('inicio')" class="cursor-pointer">
+                <img id="logo.png" src="Logo Smart Visa.png" alt="SMART VISA" class="h-20 w-auto object-contain hover:scale-105 transition-transform duration-200" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x80/1A4DA1/FFFFFF?text=SMART+VISA';">
+            </a>
+        </div>
+
+        <nav class="flex items-center gap-3">
+            <button onclick="switchPage('inicio')" id="btn-tab-inicio" class="nav-btn active-tab px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-house"></i> INICIO
+            </button>
+            <button onclick="switchPage('servicios')" id="btn-tab-servicios" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-passport"></i> NUESTROS SERVICIOS
+            </button>
+            <button onclick="switchPage('nosotros')" id="btn-tab-nosotros" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-users"></i> SOBRE NOSOTROS
+            </button>
+            <button onclick="switchPage('contactanos')" id="btn-tab-contactanos" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-envelope"></i> CONTACTANOS
+            </button>
+        </nav>
+    </header>
+
+    <!-- ================= 1. PÁGINA INICIO ================= -->
+    <div id="page-inicio" class="page-content">
+        <section class="w-full max-w-6xl mx-auto px-4 py-12">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-orange-500 tracking-wide">
+                    Expertos en Trámites Consulares
+                </h1>
+                <p class="text-sm md:text-base text-white mt-4 max-w-2xl mx-auto leading-relaxed">
+                    Gestionamos tu solicitud de visa de forma ágil y transparente.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-white/40">
+                    <div class="icon-spin w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                        <i class="fa-solid fa-clock text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-2">Trámites Ágiles</h3>
+                    <p class="text-x text-white leading-relaxed">
+                        Maximizamos la velocidad de agenda y llenado de solicitudes oficiales.
+                    </p>
+                </div>
+
+                 <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-white/40">
+                    <div class="icon-spin w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                        <i class="fa-solid fa-file-signature text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-2">Simulacro Consular</h3>
+                    <p class="text-x text-white leading-relaxed">
+                        Práctica de entrevista real previa para tu cita oficial ante la embajada.
+                    </p>
+                </div>
+
+                <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-white/40">
+                    <div class="icon-spin w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                        <i class="fa-solid fa-shield-halved text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Garantía y Confianza</h3>
+                    <p class="text-x text-white leading-relaxed">
+                        Protección estricta de tus datos confidenciales durante todo el proceso.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <main class="flex-grow flex flex-col lg:flex-row relative overflow-hidden my-8">
+            <div class="w-full lg:w-1/3 p-6 z-20 flex flex-col justify-between max-h-[90vh] overflow-y-auto">
+                <div>
+                    <h1 class="text-3xl text-white font-extrabold text-white drop-shadow-md">
+                        ¿Cuál será tu próximo viaje?
+                    <br>
+                </br>
+                    <div class="space-y-2" id="country-list"></div>
+                </div>
+                
+            </div>
+
+            <div class="w-full lg:w-2/3 h-[100px] lg:h-auto relative flex-grow" id="canvas-container">
+                <div id="country-modal" class="hidden absolute bottom-6 right-6 left-6 lg:left-auto lg:w-96 glass-card rounded-2xl p-5 shadow-2xl border border-white/30 z-30 overflow-hidden">
+                    <button onclick="closeModal()" class="absolute top-3 right-3 bg-black/40 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm z-10 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="relative h-44 rounded-xl overflow-hidden mb-4 border border-white/20 shadow-md">
+                        <img id="modal-img" src="" alt="Lugar Turístico" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
+                            <p id="modal-tourist-spot" class="text-xs font-bold text-white drop-shadow"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-1 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
+                            <img id="modal-flag" src="" class="flag-img" alt="Bandera">
+                        </div>
+                        <div>
+                            <h3 id="modal-title" class="text-xl font-bold text-bla leading-tight">México</h3>
+                            <p id="modal-capital" class="text-xs text-red-500 font-semibold">Capital: Ciudad de México</p>
+                        </div>
+                    </div>
+                    <p id="modal-desc" class="text-xs text-blue-100 mb-4 line-clamp-2">
+                        Asesoría completa para trámite de visa de turismo y negocios.
+                    </p>
+                    <div class="flex gap-2">
+                        <button onclick="switchPage('servicios')" class="flex-1 bg-white/20 hover:bg-white/30 text-black font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-white/30">
+                            <i class="fa-solid fa-circle-info text-black"></i> Leer más
+                        </button>
+                        <button onclick="solicitarVisa()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-lg transition">
+                            ¡Tramitar Visa!
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <section class="pasos-section my-8">
+            <h2>Tu Proceso en 4 Sencillos Pasos</h2>
+            <p class="subtitulo">Pasa el cursor sobre cada tarjeta para ver la información detallada</p>
+
+            <div class="pasos-container">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">1</div>
+                            <h3>Elige tu Destino</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-earth-americas icono-atras"></i>
+                            <h4>1. Selección</h4>
+                            <p>Selecciona entre Estados Unidos, Canadá, México, China o Reino Unido para iniciar tu expediente personalizado.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">2</div>
+                            <h3>Asesoría Inicial</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-clipboard-check icono-atras"></i>
+                            <h4>2. Diagnóstico</h4>
+                            <p>Evaluamos tu perfil financiero y laboral para maximizar tus posibilidades de aprobación antes de presentar la solicitud.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">3</div>
+                            <h3>Gestión y Cita</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-calendar-days icono-atras"></i>
+                            <h4>3. Trámite Oficial</h4>
+                            <p>Nos encargamos del llenado técnico del formulario (DS-160, etc.) y programamos tu cita consular oficial.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">4</div>
+                            <h3>¡Viaja Seguro!</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-plane-departure icono-atras"></i>
+                            <h4>4. Simulacro y Visa</h4>
+                            <p>Te preparamos con un simulacro de entrevista consular. Apruebas tu visa y ¡listo para despegar!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-[#0b1a3a] border-t border-b border-white/10 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-12">
+                    <span class="bg-red-600 text-white border border-red-500 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                        <i class="fa-solid fa-comments text-white mr-1"></i> Opiniones de Clientes
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide">
+                        Experiencias y Comentarios
+                    </h2>
+                    <p class="mt-3 text-sm md:text-base text-blue-200 max-w-xl mx-auto">
+                        Comentarios reales de usuarios que han tramitado su visa con Smart Visa.
+                    </p>
+                </div>
+
+                <div id="reviews-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+        </section>
+</div>
+
+    <!-- ================= 2. PÁGINA SERVICIOS ================= -->
+    <div id="page-servicios" class="page-content hidden">
+        <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full">
+            <section class="mb-16">
+                <div class="text-center mb-6">
+                    <span class="bg-red-600 text-white border border-red-500 text-1x1 font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                        Elige tu próxima meta
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white uppercase">Visas Disponibles</h2>
+                    <p class="text-blue-200 text-sm mt-2">Nuestros principales destinos con asesoría consular garantizada (Turismo & Estudiante).</p>
+                </div>
+
+                <div class="swiper miCarrusel">
+                    <div class="swiper-wrapper">
+                        <!-- EE. UU. -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-red-500">
+                            <div class="text-5xl mb-3">🇺🇸</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Estados Unidos</h3>
+                            <p class="text-1x1 text-red-700 mb-4 font-semibold">Turismo, Negocios & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Correo Electronico Activo.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pago De Tasa Consular.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral y Extractos Bancarios.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa EE. UU.')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- MÉXICO -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-green-500">
+                            <div class="text-5xl mb-3">🇲🇽</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Méxicana</h3>
+                            <p class="text-1x1 text-green-700 mb-4 font-semibold">Turismo, Negocios & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaport Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Fotografia Tamaño Carnet.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Formulario De Solucitud.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral Y Bancaria.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa México')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- CANADÁ -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-red-500">
+                            <div class="text-5xl mb-3">🇨🇦</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Canadiense</h3>
+                            <p class="text-1x1 text-red-700 mb-4 font-semibold">Visitor Visa & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Carta con proposito de viaje.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pago de Tasa Consular y Biometricos.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa Canadá')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- REINO UNIDO -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-blue-500">
+                            <div class="text-5xl mb-3">🇬🇧</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Reino Unido</h3>
+                            <p class="text-1x1 text-blue-700 mb-4 font-semibold">Standard Visitor & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral Y Bancaria</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Examen De Tuberculosis.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Carta De Invitacion (Si Aplica).</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa Reino Unido')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- CHINA -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-yellow-500">
+                            <div class="text-5xl mb-3">🇨🇳</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa China</h3>
+                            <p class="text-1x1 text-yellow-700 mb-4 font-semibold">Turismo L / Comercial M </p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Fotografia Digital y Fisica.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral Y Bancaria.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Comprobante De Cita.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa China')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 tex-white transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </section>
+
+            <section>
+                <div class="text-center mb-10">
+                    <span class="bg-blue-900 text-white font-extrabold text-4xl px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                        <h1><i class=" text-white mr-1"></i> OTROS TRÁMITES MIGRATORIOS</h1>
+                        </span>
+                    <p class="text-white font-semibold text-sm mt-2">Soluciones integrales para residentes, empresas y viajeros.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-red-500 hover:border-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-600 border border-red-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-rotate"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-red-700">Renovación de Visas</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Renovación de visas para EE. UU., Canadá, Reino Unido y China. 
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-blue-500 hover:border-blue-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-700">Servicio de Fotografía</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Toma y edición de fotografías cumpliendo con las medidas, iluminación, fondo y parámetros biométricos exigidos por las embajadas.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-red-500 hover:border-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-600 border border-red-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-passport"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-red-700">Pasaportes EE. UU. y España</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Gestión de citas y documentación para renovación y primera vez de pasaportes americanos y españoles.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-blue-500 hover:border-blue-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-id-card"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-700">Residencias de EE. UU.</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Asesoría y procesamiento de residencia permanente (Green Card).
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-red-500 hover:border-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-600 border border-red-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-red-700">Empresas LLC en EE. UU.</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Apertura, registro y legalización de empresas LLC en Estados Unidos.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-blue-500 hover:border-blue-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-plane-up"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-700">Otros Trámites y Viajes</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Solicitud de FOIA, evaluación de perdones migratorios, emisión de tickets aéreos y paquetes turísticos locales e internacionales.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= 3. PÁGINA NOSOTROS ================= -->
+    <div id="page-nosotros" class="page-content hidden">
+        <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full space-y-16">
+            <section class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-red-600 text-white border border-red-500 text-2xl font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block">
+                    Conoce a Nuestro Equipo
+                </span>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide"></h1>
+                <p class="text-sm md:text-base text-blue-100 leading-relaxed">
+                    En <strong class="text-white">Smart Visa</strong> te ofrecemos la mejor y mas Profesional asesoría personalizada para que tu proceso sea mas limpio y seguro
+                </p>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-2xl text-center border-t-4 border-t-red-500 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-red-600 border border-red-500 flex items-center justify-center mb-4 text-white text-2xl">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-red-700 mb-2">Nuestra Misión</h3>
+                    <p class="text-1x1 font-semibold text-white leading-relaxed">
+                        Ser la agencia de consultoría y asesoría de visas líder en el mercado, brindando un servicio personalizado, profesional y tecnológicamente avanzado que garantice la máxima satisfacción de nuestros clientes, el bienestar de nuestro equipo y el liderazgo de la organización
+                    </p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl text-center border-t-4 border-t-blue-500 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-blue-600 border border-blue-500 flex items-center justify-center mb-4 text-white text-2xl">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-blue-900 mb-2">Nuestra Visión</h3>
+                    <p class="text-1x1 font-semibold text-white leading-relaxed">
+                        Ser la agencia de consultoría migratoria capaz de proponer las mejores estrategias de elegibilidad para cada cliente, empoderándolos para ser perfilados como aptos y cumpliendo sus objetivos. 
+                    </p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl text-center border-t-4 border-t-red-500 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-red-600 border border-red-500 flex items-center justify-center mb-4 text-white text-2xl">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-red-700 mb-2">Nuestros Valores</h3>
+                    <p class="text-1x1 font-semibold text-white leading-relaxed">
+                    Ética, transparencia, innovación, desarrollo constante de nuestro equipo y máxima calidad en nuestro trabajo para superar con éxito cualquier reto del entorno.
+                    </p>
+                </div>
+            </section>
+
+            <section class="relative bg-gradient-to-r from-slate-900 via-[#1A4DA1]/40 to-slate-900 border-2 border-red-500/60 rounded-3xl p-8 md:p-12 shadow-[0_0_30px_rgba(230,57,70,0.25)] overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-red-500 text-9xl pointer-events-none">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+                    <div class="relative group">
+                        <div class="w-48 h-48 md:w-56 md:h-56 rounded-full p-1.5 bg-gradient-to-tr from-red-600 via-blue-600 to-white shadow-2xl">
+                            <img src="FOTO JESSICA.png" alt="Directora Smart Visa" class="w-full h-full object-cover rounded-full border-4 border-slate-900 group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://via.placeholder.com/200/0b1a3a/FFFFFF?text=JESSICA';">
+                        </div>
+                        <span class="absolute bottom-2 right-2 bg-red-600 text-white font-black text-[10px] uppercase px-3 py-1 rounded-full shadow-lg border border-white">
+                            <i class="fa-solid fa-star mr-1"></i> CEO & Fundadora
+                        </span>
+                    </div>
+
+                    <div class="flex-1 text-center md:text-left space-y-4">
+                        <div>
+                            <span class="text-red-300 text-xs font-bold tracking-widest uppercase">Dirección General</span>
+                            <h2 class="text-2xl md:text-4xl font-extrabold text-white mt-1">Lic. Jessica Martinez Morgan</h2>
+                            <p class="text-xs md:text-sm text-white font-medium">Master in U.S. immigration Law & procedural practice</p>
+                        </div>
+                        
+                        <p class="text-xs md:text-sm text-white leading-relaxed italic border-l-2 border-red-500/50 pl-4 py-1">
+                            "En Smart Visa entendemos que detrás de cada pasaporte hay una historia de esfuerzo, familia o crecimiento personal. Nuestro compromiso es acompañarte con transparencia absoluta para asegurar el éxito de tu viaje."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-8">
+                <div class="text-center">
+                    <span class="bg-blue-600 text-white border border-blue-500 text-2xl font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-2">
+                        Equipo Especializado
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-white">Nuestros Trabajadores Expertos</h2>
+                    <p class="text-xs md:text-sm text-white mt-1">Profesionales dedicados a la revisión, armado de expedientes y preparación de entrevistas.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-red-500/50">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-red-500/50 shadow-[0_0_15px_rgba(230,57,70,0.3)]">
+                            <img src="FOTO DE KIMBERLY GUITY.jpg" alt="KIMBERLY MARTINEZ" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/0b1a3a/FFFFFF?text=KIMBERLY';">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">KIMBERLY MARTINEZ</h3>
+                        <p class="text-1x1 text-red-500 font-extrabold mb-3">Agente de servicio al cliente </p>
+                    </div>
+
+                    <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-blue-500/50">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                            <img src="FOTO DE ALEJANDRO VALLECILLO.jpg" alt="JOSE VALLECILLO" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/0b1a3a/FFFFFF?text=JOSE';">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">JOSE VALLECILLO</h3>
+                        <p class="text-1x1 text-red-500 font-extrabold mb-3">Agente de servicio al cliente </p>
+                    </div>
+
+                    <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-red-500/50">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-red-500/50 shadow-[0_0_15px_rgba(230,57,70,0.3)]">
+                            <img src="FOTO DE KARLA RODRIGUEZ.jpg" alt="KARLA ORDOÑEZ" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/0b1a3a/FFFFFF?text=KARLA';">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">KARLA ORDOÑEZ</h3>
+                        <p class="text-1x1 text-red-500 font-extrabold mb-3">Asistente Administrativa</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card p-8 rounded-3xl text-center space-y-6 border border-white/20">
+                <h2 class="text-3xl font-bold text-white">¿Por qué Elegir a Smart Visa?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-blue-100">
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 mx-auto flex items-center justify-center text-white text-lg">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-red-700">Transparencia Total</h4>
+                        <p class="text-white text-1x1 font-bold">Evaluamos tu perfil de forma honesta para garantizar las mejores posibilidades reales.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 mx-auto flex items-center justify-center text-whitetext-lg">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-red-700">Acompañamiento 24/7</h4>
+                        <p class="text-white text-1x1 font-bold">Resolvemos tus dudas en todo momento antes, durante y después de tu cita consular.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 mx-auto flex items-center justify-center text-whitetext-lg">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-red-700">Gestión Rápida</h4>
+                        <p class="text-white text-1x1 font-bold">Optimizamos los tiempos de agenda de citas y llenado de formularios de manera eficiente.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= 4. PÁGINA CONTACTANOS ================= -->
+    <div id="page-contactanos" class="page-content hidden">
+        <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full my-auto">
+            <h2 class="text-3xl md:text-5xl text-white font-extrabold mb-8 text-center drop-shadow-md">Contáctanos</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- CUADRO 1: WHATSAPP -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col justify-between shadow-xl border border-white/20">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-red-600 border border-red-300 rounded-2xl flex items-center justify-center">
+                                <i class="fa-brands fa-whatsapp text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-white">WhatsApp Directo</h3>
+                            </div>
+                        </div>
+                        <p class="text-x1 text-blue-200 mb-6">Elige el número de tu preferencia para chatear con nuestros asesores:</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <a href="https://wa.me/50431512768" target="_blank" class="group flex items-center justify-between bg-white/10 hover:bg-white/20 p-3.5 rounded-2xl border border-white/20 transition">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-brands fa-whatsapp text-xl text-white hover-flip-icon"></i>
+                                <span class="text-sm font-semibold text-white">+504 3151-2768</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white/60 group-hover:text-white transition"></i>
+                        </a>
+
+                        <a href="https://wa.me/50496328912" target="_blank" class="group flex items-center justify-between bg-white/10 hover:bg-white/20 p-3.5 rounded-2xl border border-white/20 transition">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-brands fa-whatsapp text-xl text-white hover-flip-icon"></i>
+                                <span class="text-sm font-semibold text-white">+504 9632-8912</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white/60 group-hover:text-white transition"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CUADRO 2: REDES SOCIALES -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col justify-between shadow-xl border border-white/20">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-red-600 border border-red-300 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid fa-share-nodes text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-white">Nuestras Redes</h3>
+                            </div>
+                        </div>
+                        <p class="text-x1 text-blue-200 mb-4">Síguenos en nuestras plataformas oficiales para avisos y novedades:</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="https://www.tiktok.com/@smartvisa_hn?_r=1&_t=ZS-99vdK8kKYWD" target="_blank" class="group flex items-center gap-2.5 bg-white/10 hover:bg-white/20 p-3 rounded-2xl border border-white/20 transition">
+                            <i class="fa-brands fa-tiktok text-lg text-white hover-flip-icon"></i>
+                            <span class="text-xs font-semibold text-white">TikTok</span>
+                        </a>
+
+                        <a href="https://www.instagram.com/smartvisahn?stkn=MXFzd3M2NzdpOHQ0MA==" target="_blank" class="group flex items-center gap-2.5 bg-white/10 hover:bg-white/20 p-3 rounded-2xl border border-white/20 transition">
+                            <i class="fa-brands fa-instagram text-lg text-white hover-flip-icon"></i>
+                            <span class="text-xs font-semibold text-white">Instagram</span>
+                        </a>
+
+                        <a href="https://www.facebook.com/share/19X1coSLPc/?mibextid=wwXIfr" target="_blank" class="group flex items-center gap-2.5 bg-white/10 hover:bg-white/20 p-3 rounded-2xl border border-white/20 transition">
+                            <i class="fa-brands fa-facebook-f text-lg text-white hover-flip-icon"></i>
+                            <span class="text-xs font-semibold text-white">Facebook</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CUADRO 3: UBICACIÓN -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col justify-between shadow-xl border border-white/20">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-blue-600 border border-blue-300 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid fa-building text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-white">Nuestra Oficina</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-600 border border-red-300 p-3 rounded-2xl mb-3 flex items-center gap-3">
+                            <i class="fa-solid fa-layer-group text-white text-xl"></i>
+                            <div>
+                                <span class="text-1x1 font-bold uppercase text-blue-400 block">Nuestra oficina</span>
+                                <strong class="text-sm text-white">Nivel 25 - Oficina Smart Visa</strong>
+                            </div>
+                        </div>
+
+                        <p class="text-1x1 text-white flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-red-400 mt-0.5"></i>
+                            <span>Avenida Principal, 13001 San Pedro Sula, Cortés</span>
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="w-full h-28 rounded-2xl overflow-hidden border border-white/20 shadow-inner">
+                            <iframe 
+                                class="w-full h-full border-0" 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.755228189873!2d-88.0437717!3d15.5367112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f665b1d41ab02df%3A0xe5d3fb2c00438995!2sNuevos%20Horizontes%20Business%20Center!5e0!3m2!1ses!2shn!4v1710000000000!5m2!1ses!2shn" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUADRO 4: FOTO ENTRADA -->
+                <div class="glass-card p-6 rounded-3xl md:col-span-2 lg:col-span-3 flex flex-col md:flex-row items-center gap-6 shadow-xl border border-white/20">
+                    <div class="w-full md:w-1/2 h-52 rounded-2xl overflow-hidden border border-white/20 shadow-md relative group">
+                        <img src="OFICINA.png"  alt="Entrada Oficina Smart Visa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://via.placeholder.com/600x300/0b1a3a/FFFFFF?text=OFICINA+SMART+VISA';">
+                        <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-white font-semibold">
+                            <i class="fa-solid fa-door-open text-red-700 mr-1"></i> Entrada Principal - Nivel 25
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-1/2 space-y-3 text-center md:text-left">
+                        <span class="bg-red-600 text-white text-1x1 font-bold px-3 py-1 rounded-full border border-yellow-500 inline-block">Visítanos</span>
+                        <h3 class="text-2xl font-bold text-white">Instalados en el Nivel 25</h3>
+                        <p class="text-1x1 text-white leading-relaxed">
+                            Te esperamos en nuestras instalacion en el <strong> Nivel 25</strong>. Contamos con sala privada de asesoría y un equipo listo para guiarte en cada paso de tu trámite.
+                        </p>
+                        <div class="pt-2 flex flex-wrap gap-2 justify-center md:justify-start">
+                            <strong><span class="text-[15px] bg-blue-200 px-3 py-1.5 rounded-xl border border-red-200"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> Lun - Vie: 8:00 AM - 5:00 PM</span></strong>
+                            <strong><span class="text-[15px] bg-blue-200 px-3 py-1.5 rounded-xl border border-red-200"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> Sábados: 8:00 AM - 12:00 PM</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- FORMULARIO RESEÑAS -->
+        <section class="w-full max-w-4xl mx-auto my-12 px-4">
+            <div class="glow-card p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-600 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="text-center mb-8 relative z-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-600 border-2 border-red-300 rounded-2xl mb-4 animate-bounce">
+                        <i class="fa-solid fa-user-secret text-3xl text-white"></i>
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide uppercase">
+                        ¡Tu Opinión Anónima Importa!
+                    </h2>
+                </div>
+
+                <form id="review-form" class="space-y-6 relative z-10">
+                    <div class="bg-white/5 border border-white/15 p-6 rounded-2xl text-center space-y-3">
+                        <label class="block text-sm font-bold tracking-wider text-white uppercase">
+                            ¿Cuántas estrellas le das a Smart Visa?
+                        </label>
+                        <div class="flex justify-center items-center gap-3 text-3xl md:text-5xl text-gray-600 cursor-pointer py-2 select-none" id="star-rating">
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="1"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="2"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="3"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="4"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="5"></i>
+                        </div>
+                        <span id="rating-text" class="text-1x1 font-extrabold text-red-600 tracking-widest uppercase block">¡Excelente Servicio! (5/5)</span>
+                        <input type="hidden" id="rating-value" value="5">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-1x1 font-bold uppercase tracking-wider text-white">
+                            <i class="fa-solid fa-comment-dots text-red-600 mr-1"></i> Cuéntanos tu experiencia (Anónimo)
+                        </label>
+                        <div class="input-focus-effect bg-black/30 border border-blue-400 rounded-2xl p-4">
+                            <textarea id="client-comment" placeholder="Escribe aquí tu testimonio o comentario anónimo..." class="w-full bg-transparent text-white text-white focus:outline-none placeholder-white h-32 resize-none" required></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 via-red-500 to-blue-700 hover:from-red-500 hover:to-blue-600 text-white font-extrabold text-lg py-5 rounded-2xl transition duration-300 transform hover:scale-[1.02] shadow-2xl flex items-center justify-center gap-3 tracking-wider uppercase">
+                        <i class="fa-solid fa-paper-plane text-xl"></i>
+                        Publicar mi Opinión Anónima en Inicio
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- PREGUNTAS FRECUENTES -->
+        <section class="w-full max-w-4xl mx-auto my-16 px-4">
+            <div class="text-center mb-8">
+                <span class="bg-blue-600 text-white border border-blue-300 text-xl font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                    <i class="fa-solid fa-circle-question mr-1"></i> Aclara tus dudas
+                </span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-wide uppercase">
+                    Preguntas Frecuentes
+                </h2>
+                <p class="text-1x1 text-white mt-2 font-medium">
+                    Resuelve tus inquietudes más comunes sobre el proceso de visado.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span>¿Cuánto tiempo tarda el trámite de la visa?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                        El tiempo varía según la disponibilidad de citas de la embajada. Nosotros nos encargamos de agilizar el llenado de formularios y monitorear fechas para programar tu cita lo más pronto posible.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span>¿Qué requisitos necesito para iniciar mi solicitud?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                        Principalmente necesitas tu pasaporte vigente. Dependiendo del tipo de visa (turismo, estudio, trabajo), te brindaremos una lista personalizada con los documentos de respaldo.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span>¿Es obligatorio tener el boleto aéreo comprado antes de solicitar la visa?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                    No. Las embajadas recomiendan no comprar boletos definitivos hasta contar con la visa aprobada. Nosotros podemos emitir reservas o itinerarios de viaje provisionales para la presentación de tu solicitud.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span> ¿Puedo solicitar visa si soy independiente, emprendedor o no tengo trabajo formal?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                        Sí. Se evalúan tus ingresos, propiedades, registros de negocio o vínculos con el país para demostrar estabilidad económica y lazo social.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER GENERAL -->
+    <footer class="w-full bg-[#071126] border-t-2 border-white/20 py-10 px-8 text-white relative z-40 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col items-center md:items-start gap-4">
+                <h3 class="text-sm font-bold tracking-widest text-blue-300 uppercase">Síguenos en nuestras redes</h3>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <a href="https://www.tiktok.com/@smartvisa_hn?_r=1&_t=ZS-99vdK8kKYWD" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-tiktok text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">TikTok</span>
+                    </a>
+                    <a href="https://www.instagram.com/smartvisahn?stkn=MXFzd3M2NzdpOHQ0MA==" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-instagram text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">Instagram</span>
+                    </a>
+                    <a href="https://www.facebook.com/share/19X1coSLPc/?mibextid=wwXIfr" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-facebook-f text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">Facebook</span>
+                    </a>
+                    <a href="https://wa.me/message/EEMUGPMS6YQEN1" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-whatsapp text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón flotante de WhatsApp -->
+<a href="https://wa.me/50431512768?text=Hola,%20deseo%20información%20sobre%20sus%20servicios."
+   class="whatsapp-float"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Contactar por WhatsApp">
+
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="32" height="32"
+       viewBox="0 0 24 24"
+       fill="white">
+    <path d="M20.52 3.48A11.8 11.8 0 0 0 12.12 0C5.6 0 .3 5.3.3 11.82c0 2.08.55 4.1 1.6 5.88L.2 24l6.46-1.69a11.8 11.8 0 0 0 5.46 1.35h.01c6.52 0 11.82-5.3 11.82-11.82 0-3.16-1.23-6.12-3.43-8.36ZM12.13 21.65a9.8 9.8 0 0 1-4.99-1.37l-.36-.21-3.84 1.01 1.03-3.74-.24-.38a9.8 9.8 0 1 1 8.4 4.69Zm5.38-7.35c-.29-.15-1.71-.84-1.98-.93-.26-.1-.46-.15-.65.15-.2.29-.75.93-.92 1.12-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.32-1.43-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.3-.49.1-.19.05-.36-.03-.51-.07-.15-.65-1.57-.9-2.15-.24-.57-.48-.49-.65-.5h-.55c-.2 0-.51.07-.78.36-.27.29-1.02 1-1.02 2.43s1.05 2.82 1.2 3.02c.15.19 2.06 3.15 5 4.42.7.3 1.24.48 1.66.61.7.22 1.34.19 1.84.12.56-.08 1.71-.7 1.95-1.38.24-.68.24-1.27.17-1.39-.07-.12-.27-.19-.56-.34Z"/>
+  </svg>
+</a>
+
+<style>
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 25px;
+    right: 25px;
+    background-color: #25D366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.12);
+    background-color: #1ebe5d;
+}
+</style>
+        
+    <!-- SWIPER JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- SCRIPT PRINCIPAL E INTERACTIVO -->
+    <script>
+        // CONFIGURACIÓN DE PÁGINAS DINÁMICAS
+        function switchPage(pageId) {
+            document.body.classList.remove('page-loaded');
+            document.body.classList.add('page-exiting');
+
+            setTimeout(() => {
+                document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`page-${pageId}`).classList.remove('hidden');
+
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-tab'));
+                const activeBtn = document.getElementById(`btn-tab-${pageId}`);
+                if (activeBtn) activeBtn.classList.add('active-tab');
+
+                window.scrollTo(0, 0);
+
+                document.body.classList.remove('page-exiting');
+                document.body.classList.add('page-loaded');
+
+                if (pageId === 'servicios' && window.mySwiperInstance) {
+                    window.mySwiperInstance.update();
+                }
+            }, 500);
+        }
+
+        // DATOS MUNDO 3D
+        const COUNTRIES = [
+            { id: 'mexico', name: 'México', flagUrl: 'https://flagcdn.com/w80/mx.png', capital: 'Ciudad de México', lat: 23.6345, lng: -102.5528, desc: 'Descubre las pirámides, playas caribeñas y gastronomía mexicana.', touristSpot: '📍 Chichén Itzá, Yucatán', image: 'https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=800&q=80' },
+            { id: 'china', name: 'China', flagUrl: 'https://flagcdn.com/w80/cn.png', capital: 'Pekín', lat: 35.8617, lng: 104.1954, desc: 'Explora una de las culturas más antiguas del mundo y sus rascacielos.', touristSpot: '📍 La Gran Muralla China', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80' },
+            { id: 'canada', name: 'Canadá', flagUrl: 'https://flagcdn.com/w80/ca.png', capital: 'Ottawa', lat: 56.1304, lng: -106.3468, desc: 'Paisajes naturales deslumbrantes, montañas rocosas y ciudades modernas.', touristSpot: '📍 Cataratas del Niágara & CN Tower', image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=800&q=80' },
+            { id: 'usa', name: 'Estados Unidos', flagUrl: 'https://flagcdn.com/w80/us.png', capital: 'Washington D.C.', lat: 37.0902, lng: -95.7129, desc: 'El destino de negocios y turismo más icónico del continente.', touristSpot: '📍 Estatua de la Libertad, Nueva York', image: 'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?auto=format&fit=crop&w=800&q=80' },
+            { id: 'uk', name: 'Reino Unido', flagUrl: 'https://flagcdn.com/w80/gb.png', capital: 'Londres', lat: 55.3781, lng: -3.4360, desc: 'Historia real, arquitectura clásica y universidades de prestigio mundial.', touristSpot: '📍 Big Ben & Palacio de Westminster', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80' }
+        ];
+
+        let selectedCountry = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // PERSIANAS OVERLAY
+            const overlay = document.getElementById('perspective-transition-overlay');
+            for (let i = 0; i < 10; i++) {
+                const bar = document.createElement('div');
+                bar.classList.add('slice-bar');
+                bar.style.setProperty('--delay', i);
+                overlay.appendChild(bar);
+            }
+            setTimeout(() => { document.body.classList.add('page-loaded'); }, 100);
+
+            // MUNDO 3D - LISTA DE PAÍSES
+            const countryListContainer = document.getElementById('country-list');
+            COUNTRIES.forEach(country => {
+                const btn = document.createElement('div');
+                btn.className = 'glass-card p-4 rounded-xl cursor-pointer hover:glass-card-active flex items-center justify-between transition group';
+                btn.id = `btn-${country.id}`;
+                btn.onclick = () => selectCountry(country);
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${country.flagUrl}" alt="${country.name}" class="flag-img">
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-red-300 transition">${country.name}</h4>
+                            <p class="text-xs text-blue-200">${country.capital}</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-white/50 group-hover:text-white transition"></i>
+                `;
+                countryListContainer.appendChild(btn);
+            });
+
+            // MUNDO 3D - THREE.JS
+            const container = document.getElementById('canvas-container');
+            if (container) {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.z = 240;
+
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
+
+                scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+                const dirLight = new THREE.DirectionalLight(0x00d2ff, 0.8);
+                dirLight.position.set(5, 3, 5);
+                scene.add(dirLight);
+
+                const globeRadius = 80;
+                const textureLoader = new THREE.TextureLoader();
+                const worldTexture = textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg');
+
+                const globeMat = new THREE.MeshPhongMaterial({ map: worldTexture, color: 0x1d4ed8, shininess: 25 });
+                const globe = new THREE.Mesh(new THREE.SphereGeometry(globeRadius, 64, 64), globeMat);
+                scene.add(globe);
+
+                const gridGeo = new THREE.WireframeGeometry(new THREE.SphereGeometry(globeRadius + 0.5, 24, 24));
+                const gridMat = new THREE.LineBasicMaterial({ color: 0x00d2ff, transparent: true, opacity: 0.15 });
+                const gridMesh = new THREE.LineSegments(gridGeo, gridMat);
+                globe.add(gridMesh);
+
+                const markersGroup = new THREE.Group();
+                scene.add(markersGroup);
+
+                function latLngToVector3(lat, lng, radius) {
+                    const phi = (90 - lat) * (Math.PI / 180);
+                    const theta = (lng + 180) * (Math.PI / 180);
+                    return new THREE.Vector3(
+                        -(radius * Math.sin(phi) * Math.cos(theta)),
+                        radius * Math.cos(phi),
+                        radius * Math.sin(phi) * Math.sin(theta)
+                    );
+                }
+
+                COUNTRIES.forEach(c => {
+                    const pos = latLngToVector3(c.lat, c.lng, globeRadius + 1.2);
+                    const dotMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff0033 }));
+                    dotMesh.position.copy(pos);
+                    const glowMesh = new THREE.Mesh(new THREE.SphereGeometry(3.8, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff0033, transparent: true, opacity: 0.4 }));
+                    glowMesh.position.copy(pos);
+                    markersGroup.add(dotMesh);
+                    markersGroup.add(glowMesh);
+                });
+
+                let isDragging = false, prevMousePos = { x: 0, y: 0 };
+                container.addEventListener('mousedown', (e) => { isDragging = true; prevMousePos = { x: e.clientX, y: e.clientY }; });
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const deltaX = e.clientX - prevMousePos.x;
+                    const deltaY = e.clientY - prevMousePos.y;
+                    globe.rotation.y += deltaX * 0.005;
+                    globe.rotation.x += deltaY * 0.005;
+                    markersGroup.rotation.y = globe.rotation.y;
+                    markersGroup.rotation.x = globe.rotation.x;
+                    prevMousePos = { x: e.clientX, y: e.clientY };
+                });
+                window.addEventListener('mouseup', () => isDragging = false);
+
+                window.selectCountry = function(country) {
+                    selectedCountry = country;
+                    document.querySelectorAll('#country-list > div').forEach(el => el.classList.remove('glass-card-active'));
+                    document.getElementById(`btn-${country.id}`).classList.add('glass-card-active');
+
+                    const modal = document.getElementById('country-modal');
+                    modal.classList.remove('hidden', 'modal-animate-enter');
+                    void modal.offsetWidth; 
+                    modal.classList.add('modal-animate-enter');
+
+                    document.getElementById('modal-img').src = country.image;
+                    document.getElementById('modal-tourist-spot').innerText = country.touristSpot;
+                    document.getElementById('modal-flag').src = country.flagUrl;
+                    document.getElementById('modal-title').innerText = country.name;
+                    document.getElementById('modal-capital').innerText = `Capital: ${country.capital}`;
+                    document.getElementById('modal-desc').innerText = country.desc;
+
+                    const targetLat = country.lat * (Math.PI / 180);
+                    const targetLng = -country.lng * (Math.PI / 180);
+
+                    let steps = 0;
+                    function animateToCountry() {
+                        if (steps < 30) {
+                            globe.rotation.y += (targetLng - globe.rotation.y) * 0.1;
+                            globe.rotation.x += (targetLat * 0.3 - globe.rotation.x) * 0.1;
+                            markersGroup.rotation.y = globe.rotation.y;
+                            markersGroup.rotation.x = globe.rotation.x;
+                            steps++;
+                            requestAnimationFrame(animateToCountry);
+                        }
+                    }
+                    animateToCountry();
+                };
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (!isDragging) {
+                        globe.rotation.y += 0.0015;
+                        markersGroup.rotation.y = globe.rotation.y;
+                    }
+                    renderer.render(scene, camera);
+                }
+                animate();
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                });
+            }
+
+            // CARGAR RESEÑAS
+            loadReviews();
+
+            // FORMULARIO DE RESEÑAS EN CONTACTANOS
+            const stars = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('rating-value');
+            const ratingText = document.getElementById('rating-text');
+            const reviewForm = document.getElementById('review-form');
+
+            const ratingLabels = {
+                1: "Deficiente (1/5)",
+                2: "Regular (2/5)",
+                3: "Bueno (3/5)",
+                4: "Muy Bueno (4/5)",
+                5: "¡Excelente Servicio! (5/5)"
+            };
+
+            if (stars.length) {
+                stars.forEach((star, index) => {
+                    star.addEventListener('click', () => {
+                        const val = index + 1;
+                        ratingInput.value = val;
+                        ratingText.textContent = ratingLabels[val];
+                        highlightStars(index);
+                    });
+                    star.addEventListener('mouseover', () => highlightStars(index));
+                    star.addEventListener('mouseleave', () => highlightStars(parseInt(ratingInput.value) - 1));
+                });
+            }
+
+            function highlightStars(index) {
+                stars.forEach((s, i) => {
+                    if (i <= index) {
+                        s.classList.add('text-red-500', 'active-star');
+                        s.classList.remove('text-gray-500');
+                    } else {
+                        s.classList.add('text-gray-500');
+                        s.classList.remove('text-red-500', 'active-star');
+                    }
+                });
+            }
+
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newReview = {
+                        name: "Usuario Anónimo",
+                        visa: "Trámite de Visado",
+                        comment: document.getElementById('client-comment').value,
+                        stars: parseInt(ratingInput.value),
+                        date: "Hace un momento"
+                    };
+
+                    let reviews = JSON.parse(localStorage.getItem('smartvisa_reviews')) || [];
+                    reviews.unshift(newReview);
+                    localStorage.setItem('smartvisa_reviews', JSON.stringify(reviews));
+
+                    alert('¡Gracias! Tu opinión anónima ha sido registrada y publicada en nuestro Inicio.');
+                    document.getElementById('client-comment').value = '';
+                    loadReviews();
+                    switchPage('inicio');
+                });
+            }
+
+            // FAQ ACCORDION
+            const faqButtons = document.querySelectorAll('.faq-btn');
+            faqButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const answer = button.nextElementSibling;
+                    const icon = button.querySelector('i');
+                    answer.classList.toggle('hidden');
+                    icon.style.transform = answer.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                });
+            });
+
+            // INICIALIZAR SWIPER EN SERVICIOS
+            window.mySwiperInstance = new Swiper(".miCarrusel", {
+                effect: "coverflow",
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: "auto",
+                initialSlide: 0,
+                loop: true,
+                autoplay: {
+                    delay: 2800,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                speed: 800,
+                coverflowEffect: {
+                    rotate: 20,
+                    stretch: 0,
+                    depth: 150,
+                    modifier: 1,
+                    slideShadows: false
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                }
+            });
+        });
+
+        function loadReviews() {
+            const defaultReviews = [
+                { rating: 5, text: "Mi experiencia fue satisfactoria y profesional, me asesoraron y aclararon muchas de mis dudas y se me instruyó muy bien sobre cómo responder adecuadamente.." },
+                { rating: 5, text: "La ayuda que me brindaron fue de calidad, siempre contestaron muy amablemente todas mis inquietudes y me guiaron en el proceso. Estoy muy feliz por que ahora cuento con mi visa.." },
+                { rating: 5, text: "100% recomendados! Fueron claros con los pasos a seguir, dan seguimiento y tienen paciencia para explicar todo! Muy satisfecha." },
+                { rating: 4, text: "Excelente atención, muy profesionales , muy satisfecha, muy claro todo , me encantó la preparación para la entrevista consular !." }
+            ];
+
+            const savedReviewsRaw = JSON.parse(localStorage.getItem('smartvisa_reviews')) || [];
+            const savedReviewsFormatted = savedReviewsRaw.map(r => ({
+                rating: Number(r.stars || r.rating) || 5,
+                text: r.comment || r.text || "Excelente atención y trámite."
+            }));
+
+            const combined = [...savedReviewsFormatted, ...defaultReviews];
+            const displayReviews = combined.slice(0, Math.max(4, savedReviewsFormatted.length));
+
+            const containerReviews = document.getElementById('reviews-container');
+            if (containerReviews) {
+                containerReviews.innerHTML = displayReviews.map(rev => `
+                    <div class="floating-review-card p-6 rounded-3xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-1 text-red-500 mb-3 text-lg">
+                                ${'<i class="fa-solid fa-star"></i>'.repeat(rev.rating)}
+                                ${'<i class="fa-regular fa-star text-white/30"></i>'.repeat(5 - rev.rating)}
+                            </div>
+                            <p class="text-blue-100 text-sm italic leading-relaxed">"${rev.text}"</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                            <span class="text-xs font-bold text-red-400 uppercase tracking-wider">
+                                <i class="fa-solid fa-user-check mr-1"></i> Cliente Verificado
+                            </span>
+                            <i class="fa-solid fa-quote-right text-white/20 text-xl"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('country-modal').classList.add('hidden');
+        }
+
+        function solicitarVisa() {
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            const destino = selectedCountry ? selectedCountry.name : 'mi visa';
+            const mensaje = encodeURIComponent(`Hola, me gustaría solicitar más información para tramitar mi visa a ${destino}.`);
+            setTimeout(() => { window.open(`https://wa.me/message/EEMUGPMS6YQEN1?text=${mensaje}`, '_blank'); }, 500);
+        }
+
+        function irAWhatsApp(servicio = '') {
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            const textoMensaje = servicio 
+                ? `Hola, deseo solicitar información sobre el trámite de: ${servicio}` 
+                : `Hola, me gustaría solicitar más información sobre los trámites de visa.`;
+            const mensaje = encodeURIComponent(textoMensaje);
+            setTimeout(() => { window.open(`https://wa.me/message/EEMUGPMS6YQEN1?text=${mensaje}`, '_blank'); }, 500);
+        }
+
+        function solicitarServicio(servicio) {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            setTimeout(() => {
+                const mensaje = encodeURIComponent(`Hola Smart Visa, deseo obtener más información sobre el servicio de: ${servicio}`);
+                window.open(`https://wa.me/message/EEMUGPMS6YQEN1?text=${mensaje}`, '_blank');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
